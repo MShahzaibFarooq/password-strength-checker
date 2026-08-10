@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Strength Checker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <main class="app-shell">
+        <section class="hero-panel" aria-labelledby="project-title">
+            <div class="hero-copy">
+                <p class="eyebrow">Cybersecurity Internship Project</p>
+                <h1 id="project-title">Password Strength Checker</h1>
+                <p class="description">
+                    Analyze password strength and check whether it has appeared in known breaches.
+                </p>
+            </div>
+        </section>
+
+        <section class="checker-panel" aria-label="Password analysis form">
+            <form id="password-form" autocomplete="off">
+                <label for="password">Password</label>
+                <div class="password-field">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="new-password"
+                        spellcheck="false"
+                        aria-describedby="status-message"
+                    >
+                    <button type="button" id="toggle-password" class="ghost-button">Show</button>
+                </div>
+                <button type="submit" id="analyze-button" class="primary-button">Analyze Password</button>
+                <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+            </form>
+
+            <div class="result-grid" id="results" hidden>
+                <section class="result-summary" aria-label="Password strength result">
+                    <div class="meter" aria-hidden="true">
+                        <span id="meter-fill"></span>
+                    </div>
+                    <p class="summary-label">Strength</p>
+                    <p id="strength-label" class="strength-label">WEAK</p>
+                    <p id="score-label" class="score-label"></p>
+                </section>
+
+                <section class="checks-panel" aria-label="Password requirements">
+                    <h2>Password Requirements</h2>
+                    <ul class="check-list">
+                        <li id="check-minimum-length"><span></span>At least 8 characters</li>
+                        <li id="check-lowercase"><span></span>Lowercase letter</li>
+                        <li id="check-uppercase"><span></span>Uppercase letter</li>
+                        <li id="check-number"><span></span>Number</li>
+                        <li id="check-symbol"><span></span>Special character</li>
+                        <li id="check-common"><span></span>Not a common password</li>
+                    </ul>
+                </section>
+
+                <section class="status-panel" aria-label="Security status">
+                    <h2>Breach Status</h2>
+                    <p id="breach-status" class="security-status"></p>
+                    <h2>Common Password Status</h2>
+                    <p id="common-status" class="security-status"></p>
+                    <div id="feedback" class="feedback"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
