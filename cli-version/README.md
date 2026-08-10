@@ -12,6 +12,12 @@ python -m pip install requests
 python password_checker.py
 ```
 
+For exact local testing without hidden input:
+
+```powershell
+python password_checker.py --password "Hassan@786"
+```
+
 The CLI asks for a password, analyzes it in memory, and displays:
 
 - Minimum length result
@@ -22,8 +28,9 @@ The CLI asks for a password, analyzes it in memory, and displays:
 - Common password result
 - Breach status and occurrence count when available
 - Final strength: WEAK, MEDIUM, or STRONG
+- Effective score after hard security overrides
 
-The CLI does not print the plaintext password after input and does not store it.
+The CLI shows typed input while entering the password, but it does not print the plaintext password again after analysis and does not store it.
 
 ## Notes
 

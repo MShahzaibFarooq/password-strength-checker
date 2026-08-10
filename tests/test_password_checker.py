@@ -8,10 +8,19 @@ from shared import password_logic
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 WEB_APP_PATH = PROJECT_ROOT / "web-version" / "app.py"
+CLI_APP_PATH = PROJECT_ROOT / "cli-version" / "password_checker.py"
 
 
 def load_web_app_module():
     spec = importlib.util.spec_from_file_location("web_password_app", WEB_APP_PATH)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def load_cli_app_module():
+    spec = importlib.util.spec_from_file_location("cli_password_app", CLI_APP_PATH)
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
@@ -140,6 +149,25 @@ def test_web_api_returns_analysis(monkeypatch):
 
     assert response.status_code == 200
     assert response.get_json()["strength"] == "WEAK"
+
+
+def test_cli_web_and_shared_analysis_match(monkeypatch):
+    monkeypatch.setattr(password_logic, "check_pwned_password", offline_breach_result)
+    cli_app = load_cli_app_module()
+    web_app = load_web_app_module()
+    client = web_app.app.test_client()
+
+    for password in ["Ab1!", "SecurePass", "Password1", "Q7m!vL2z#rT9nP4x"]:
+        shared_result = password_logic.analyze_password(password)
+        cli_result = cli_app.analyze_password(password)
+        web_result = client.post("/api/check-password", json={"password": password}).get_json()
+
+        assert cli_result["strength"] == shared_result["strength"]
+        assert cli_result["score"] == shared_result["score"]
+        assert cli_result["checks"] == shared_result["checks"]
+        assert web_result["strength"] == shared_result["strength"]
+        assert web_result["score"] == shared_result["score"]
+        assert web_result["checks"] == shared_result["checks"]
 
 
 def test_hibp_sends_only_sha1_prefix(monkeypatch):

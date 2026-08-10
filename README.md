@@ -2,12 +2,19 @@
 
 ## Overview
 
-Password Strength Checker is a cybersecurity internship project based on DecodeLabs Cyber Security Project 1. It demonstrates password validation, conditional logic, string handling, secure API usage, and beginner-friendly secure coding practices.
+Password Strength Checker is a cybersecurity project that demonstrates password validation, conditional logic, string handling, secure API usage, and beginner-friendly secure coding practices.
+
+Live site:
+
+```text
+https://mshahzaibfarooq.github.io/password-strength-checker/
+```
 
 The project includes two complete implementations:
 
 - `cli-version`: a pure Python terminal application
 - `web-version`: a Flask web application with HTML, CSS, and vanilla JavaScript
+- `docs`: a static GitHub Pages version
 
 Both versions use the same shared password-analysis logic from `shared/password_logic.py`.
 
@@ -32,6 +39,12 @@ password-strength-checker/
 │   └── 10k-most-common.txt
 ├── shared/
 │   └── password_logic.py
+├── docs/
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+│   └── data/
+│       └── 10k-most-common.txt
 ├── cli-version/
 │   ├── password_checker.py
 │   └── README.md
@@ -77,7 +90,7 @@ Final score:
 
 ## Common Password Detection
 
-The file `data/10k-most-common.txt` is a local common-password list copied from Downloads. It is used for Common Password Check only. It is not a complete leaked-password database.
+The file `data/10k-most-common.txt` is a local common-password list. It is used for Common Password Check only. It is not a complete leaked-password database.
 
 ## HIBP Integration
 
@@ -112,6 +125,44 @@ Then open:
 ```text
 http://127.0.0.1:5000
 ```
+
+## Live Demo
+
+The `docs` folder contains a static version for GitHub Pages.
+
+Enable it from:
+
+```text
+Repository Settings > Pages > Deploy from a branch > main > /docs
+```
+
+The GitHub Pages version runs in the browser and uses the same scoring rules.
+
+## Screenshots
+
+### CLI Weak Breached Password
+
+![CLI weak breached password result](docs/assets/cli-weak-breached.png)
+
+### CLI Medium Password
+
+![CLI medium password result](docs/assets/cli-medium-not-found.png)
+
+### Home Screen
+
+![Home screen](docs/assets/password-checker-home.png)
+
+### Weak Password
+
+![Weak password result](docs/assets/password-checker-weak-common.png)
+
+### Medium Password
+
+![Medium password result](docs/assets/password-checker-medium.png)
+
+### Strong Password
+
+![Strong password result](docs/assets/password-checker-strong.png)
 
 ## Testing
 

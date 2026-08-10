@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import getpass
+import argparse
 import sys
 from pathlib import Path
 
@@ -52,14 +52,24 @@ def print_analysis(result: dict) -> None:
     print()
     print("Final Strength:")
     print(result["strength"])
+    print(f"Effective score: {result['score']} / 6")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Analyze password strength from the terminal.")
+    parser.add_argument(
+        "--password",
+        help="Analyze an exact password value. Use only for local testing.",
+    )
+    args = parser.parse_args()
+
     print("=" * 40)
     print("       PASSWORD STRENGTH CHECKER")
     print("=" * 40)
-    if sys.stdin.isatty():
-        password = getpass.getpass("Enter password: ")
+    if args.password is not None:
+        password = args.password
+    elif sys.stdin.isatty():
+        password = input("Enter password: ")
     else:
         print("Enter password: ", end="")
         password = sys.stdin.readline().rstrip("\n")

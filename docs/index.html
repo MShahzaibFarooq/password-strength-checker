@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Strength Checker</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="page-shell">
         <header class="site-header">
             <h1>Password Strength Checker</h1>
             <p class="header-copy">
-                Analyze password strength and check whether it has appeared in known data breaches.
+                Analyze password strength, common-password exposure, and known breach status.
             </p>
         </header>
 
-        <main class="app-card" aria-labelledby="checker-title">
+        <main class="app-card">
             <section class="input-section">
                 <div class="section-heading">
-                    <h2 id="checker-title">Password Analysis</h2>
+                    <h2>Password Analysis</h2>
                 </div>
 
                 <form id="password-form" autocomplete="off" novalidate>
@@ -26,7 +26,6 @@
                     <div class="password-control">
                         <input
                             id="password"
-                            name="password"
                             type="password"
                             placeholder="Enter your password"
                             autocomplete="new-password"
@@ -68,36 +67,12 @@
                         <p>Core checks from the password-strength analysis.</p>
                     </div>
                     <ul class="check-list">
-                        <li id="check-minimum-length">
-                            <span class="check-dot" aria-hidden="true"></span>
-                            <span class="check-name">Minimum 8 characters</span>
-                            <span class="check-status">FAIL</span>
-                        </li>
-                        <li id="check-lowercase">
-                            <span class="check-dot" aria-hidden="true"></span>
-                            <span class="check-name">Lowercase letter</span>
-                            <span class="check-status">FAIL</span>
-                        </li>
-                        <li id="check-uppercase">
-                            <span class="check-dot" aria-hidden="true"></span>
-                            <span class="check-name">Uppercase letter</span>
-                            <span class="check-status">FAIL</span>
-                        </li>
-                        <li id="check-number">
-                            <span class="check-dot" aria-hidden="true"></span>
-                            <span class="check-name">Number</span>
-                            <span class="check-status">FAIL</span>
-                        </li>
-                        <li id="check-symbol">
-                            <span class="check-dot" aria-hidden="true"></span>
-                            <span class="check-name">Special character</span>
-                            <span class="check-status">FAIL</span>
-                        </li>
-                        <li id="check-common">
-                            <span class="check-dot" aria-hidden="true"></span>
-                            <span class="check-name">Not a common password</span>
-                            <span class="check-status">FAIL</span>
-                        </li>
+                        <li id="check-minimum-length"><span class="check-dot" aria-hidden="true"></span><span class="check-name">Minimum 8 characters</span><span class="check-status">FAIL</span></li>
+                        <li id="check-lowercase"><span class="check-dot" aria-hidden="true"></span><span class="check-name">Lowercase letter</span><span class="check-status">FAIL</span></li>
+                        <li id="check-uppercase"><span class="check-dot" aria-hidden="true"></span><span class="check-name">Uppercase letter</span><span class="check-status">FAIL</span></li>
+                        <li id="check-number"><span class="check-dot" aria-hidden="true"></span><span class="check-name">Number</span><span class="check-status">FAIL</span></li>
+                        <li id="check-symbol"><span class="check-dot" aria-hidden="true"></span><span class="check-name">Special character</span><span class="check-status">FAIL</span></li>
+                        <li id="check-common"><span class="check-dot" aria-hidden="true"></span><span class="check-name">Not a common password</span><span class="check-status">FAIL</span></li>
                     </ul>
                 </section>
 
@@ -105,7 +80,7 @@
                     <section class="analysis-panel" aria-label="Data breach check">
                         <div class="panel-heading">
                             <h2>Data Breach Check</h2>
-                            <p>Checked against Have I Been Pwned using k-anonymity.</p>
+                            <p>Uses the HIBP range API with only the first 5 SHA-1 hash characters.</p>
                         </div>
                         <p id="breach-status" class="status-pill">CHECK UNAVAILABLE</p>
                         <p id="breach-detail" class="detail-copy"></p>
@@ -130,6 +105,6 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="script.js"></script>
 </body>
 </html>
