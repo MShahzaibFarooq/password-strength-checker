@@ -2,13 +2,20 @@ const form = document.querySelector("#password-form");
 const passwordInput = document.querySelector("#password");
 const togglePasswordButton = document.querySelector("#toggle-password");
 const analyzeButton = document.querySelector("#analyze-button");
+const buttonText = analyzeButton.querySelector(".button-text");
 const statusMessage = document.querySelector("#status-message");
+const emptyState = document.querySelector("#empty-state");
+const errorState = document.querySelector("#error-state");
+const errorCopy = document.querySelector("#error-copy");
 const results = document.querySelector("#results");
 const meterFill = document.querySelector("#meter-fill");
 const strengthLabel = document.querySelector("#strength-label");
 const scoreLabel = document.querySelector("#score-label");
 const breachStatus = document.querySelector("#breach-status");
+const breachDetail = document.querySelector("#breach-detail");
 const commonStatus = document.querySelector("#common-status");
+const commonDetail = document.querySelector("#common-detail");
+const overallExplanation = document.querySelector("#overall-explanation");
 const feedback = document.querySelector("#feedback");
 
 const checkElements = {
@@ -21,31 +28,70 @@ const checkElements = {
 };
 
 const strengthStyle = {
-    WEAK: { width: "32%", color: "var(--danger)" },
-    MEDIUM: { width: "66%", color: "var(--warning)" },
-    STRONG: { width: "100%", color: "var(--accent)" },
+    WEAK: { width: "34%", color: "var(--fail)", className: "strength-weak" },
+    MEDIUM: { width: "67%", color: "var(--warning)", className: "strength-medium" },
+    STRONG: { width: "100%", color: "var(--pass)", className: "strength-strong" },
 };
 
 togglePasswordButton.addEventListener("click", () => {
     const shouldShow = passwordInput.type === "password";
     passwordInput.type = shouldShow ? "text" : "password";
     togglePasswordButton.textContent = shouldShow ? "Hide" : "Show";
+    togglePasswordButton.setAttribute("aria-label", shouldShow ? "Hide password" : "Show password");
 });
+
+function setLoading(isLoading) {
+    analyzeButton.disabled = isLoading;
+    analyzeButton.classList.toggle("loading", isLoading);
+    buttonText.textContent = isLoading ? "Analyzing Password" : "Analyze Password";
+}
 
 function setCheckState(element, passed) {
     element.classList.toggle("pass", passed);
     element.classList.toggle("fail", !passed);
-    element.querySelector("span").textContent = passed ? "✓" : "!";
+    const status = element.querySelector(".check-status");
+    status.textContent = passed ? "PASS" : "FAIL";
+}
+
+function setStatusPill(element, label, state) {
+    element.className = `status-pill ${state}`;
+    element.textContent = label;
+}
+
+function buildOverallExplanation(data) {
+    if (data.strength === "STRONG") {
+        return "Your password meets the required length and character variety checks and was not found in the common-password or known breach checks.";
+    }
+
+    if (!data.checks.minimum_length) {
+        return "This password does not meet the minimum length requirement and should be considered weak.";
+    }
+
+    if (data.checks.common_password) {
+        return "This password appears in the common-password list, so it should not be used even if it has some character variety.";
+    }
+
+    if (data.breach_check_available && data.checks.breached_password) {
+        return "This password has appeared in known data breaches and should not be reused.";
+    }
+
+    if (data.strength === "MEDIUM") {
+        return "This password meets some security requirements, but it needs stronger length or character variety before it should be considered strong.";
+    }
+
+    return "This password does not meet enough security requirements to be considered strong.";
 }
 
 function updateResults(data) {
+    emptyState.hidden = true;
+    errorState.hidden = true;
     results.hidden = false;
 
     const style = strengthStyle[data.strength] || strengthStyle.WEAK;
     meterFill.style.width = style.width;
     meterFill.style.background = style.color;
     strengthLabel.textContent = data.strength;
-    strengthLabel.style.color = style.color;
+    strengthLabel.className = `strength-label ${style.className}`;
     scoreLabel.textContent = `Score: ${data.score} / 6`;
 
     setCheckState(checkElements.minimum_length, data.checks.minimum_length);
@@ -55,27 +101,26 @@ function updateResults(data) {
     setCheckState(checkElements.symbol, data.checks.symbol);
     setCheckState(checkElements.common_password, !data.checks.common_password);
 
-    breachStatus.className = "security-status";
     if (!data.breach_check_available) {
-        breachStatus.textContent = "Breach check unavailable. Local strength analysis is still shown.";
-        breachStatus.classList.add("warn");
+        setStatusPill(breachStatus, "CHECK UNAVAILABLE", "warn");
+        breachDetail.textContent = "The breach service could not be reached. Local strength analysis is still shown.";
     } else if (data.checks.breached_password) {
-        breachStatus.textContent = `Found in known breaches. Appeared approximately ${data.breach_count.toLocaleString()} times.`;
-        breachStatus.classList.add("bad");
+        setStatusPill(breachStatus, "BREACH FOUND", "bad");
+        breachDetail.textContent = `Known breach occurrences: ${data.breach_count.toLocaleString()}`;
     } else {
-        breachStatus.textContent = "Not found in known breaches.";
-        breachStatus.classList.add("good");
+        setStatusPill(breachStatus, "NOT FOUND", "good");
+        breachDetail.textContent = "No known breach was found for this password.";
     }
 
-    commonStatus.className = "security-status";
     if (data.checks.common_password) {
-        commonStatus.textContent = "This is a commonly used password.";
-        commonStatus.classList.add("bad");
+        setStatusPill(commonStatus, "COMMON PASSWORD", "bad");
+        commonDetail.textContent = "This password is commonly used and should be avoided.";
     } else {
-        commonStatus.textContent = "Not a common password.";
-        commonStatus.classList.add("good");
+        setStatusPill(commonStatus, "NOT COMMON", "good");
+        commonDetail.textContent = "This password was not found in the local common-password list.";
     }
 
+    overallExplanation.textContent = buildOverallExplanation(data);
     feedback.innerHTML = "";
     data.feedback.forEach((message) => {
         const paragraph = document.createElement("p");
@@ -84,13 +129,34 @@ function updateResults(data) {
     });
 }
 
+function showError(message) {
+    emptyState.hidden = true;
+    results.hidden = true;
+    errorState.hidden = false;
+    errorCopy.textContent = message || "Please try again.";
+}
+
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    analyzeButton.disabled = true;
-    statusMessage.textContent = "Analyzing password... Checking known breach database...";
+    if (passwordInput.value.length === 0) {
+        statusMessage.textContent = "Enter a password to analyze.";
+        showError("Enter a password before running the analysis.");
+        passwordInput.focus();
+        return;
+    }
+
+    setLoading(true);
+    statusMessage.textContent = "Analyzing password...";
+    errorState.hidden = true;
 
     try {
+        window.setTimeout(() => {
+            if (analyzeButton.disabled) {
+                statusMessage.textContent = "Checking known breach database...";
+            }
+        }, 350);
+
         const response = await fetch("/api/check-password", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -99,14 +165,15 @@ form.addEventListener("submit", async (event) => {
 
         const data = await response.json();
         if (!response.ok) {
-            throw new Error(data.error || "The password could not be analyzed.");
+            throw new Error(data.error || "Unable to analyze password. Please try again.");
         }
 
         updateResults(data);
         statusMessage.textContent = "Analysis complete.";
     } catch (error) {
-        statusMessage.textContent = error.message;
+        showError(error.message);
+        statusMessage.textContent = "Analysis failed.";
     } finally {
-        analyzeButton.disabled = false;
+        setLoading(false);
     }
 });

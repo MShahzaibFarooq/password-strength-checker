@@ -7,67 +7,150 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <main class="app-shell">
-        <section class="hero-panel" aria-labelledby="project-title">
-            <div class="hero-copy">
-                <p class="eyebrow">Cybersecurity Internship Project</p>
-                <h1 id="project-title">Password Strength Checker</h1>
-                <p class="description">
-                    Analyze password strength and check whether it has appeared in known breaches.
-                </p>
-            </div>
-        </section>
+    <div class="page-shell">
+        <header class="site-header">
+            <p class="project-kicker">Cybersecurity Internship Project</p>
+            <h1>Password Strength Checker</h1>
+            <p class="header-copy">
+                Analyze password strength and check whether it has appeared in known data breaches.
+            </p>
+        </header>
 
-        <section class="checker-panel" aria-label="Password analysis form">
-            <form id="password-form" autocomplete="off">
-                <label for="password">Password</label>
-                <div class="password-field">
-                    <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        autocomplete="new-password"
-                        spellcheck="false"
-                        aria-describedby="status-message"
-                    >
-                    <button type="button" id="toggle-password" class="ghost-button">Show</button>
+        <main class="app-card" aria-labelledby="checker-title">
+            <section class="input-section">
+                <div class="section-heading">
+                    <p class="section-kicker">Security Utility</p>
+                    <h2 id="checker-title">Password Analysis</h2>
                 </div>
-                <button type="submit" id="analyze-button" class="primary-button">Analyze Password</button>
-                <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
-            </form>
 
-            <div class="result-grid" id="results" hidden>
-                <section class="result-summary" aria-label="Password strength result">
-                    <div class="meter" aria-hidden="true">
+                <form id="password-form" autocomplete="off" novalidate>
+                    <label for="password">Password</label>
+                    <div class="password-control">
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            autocomplete="new-password"
+                            spellcheck="false"
+                            aria-describedby="status-message privacy-copy"
+                        >
+                        <button type="button" id="toggle-password" class="visibility-button" aria-label="Show password">
+                            Show
+                        </button>
+                    </div>
+
+                    <button type="submit" id="analyze-button" class="primary-button">
+                        <span class="button-spinner" aria-hidden="true"></span>
+                        <span class="button-text">Analyze Password</span>
+                    </button>
+
+                    <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+
+            <section id="empty-state" class="empty-state" aria-live="polite">
+                <div class="state-marker" aria-hidden="true"></div>
+                <h2>Enter a password to begin</h2>
+                <p>Your password is analyzed locally. Only a partial SHA-1 hash is used for the breach check.</p>
+            </section>
+
+            <section id="error-state" class="error-state" hidden aria-live="assertive">
+                <p class="state-label">Unable to analyze password</p>
+                <p id="error-copy">Please try again.</p>
+            </section>
+
+            <section class="results" id="results" hidden aria-label="Password analysis results">
+                <div class="strength-card">
+                    <p class="result-kicker">Password Strength</p>
+                    <p id="strength-label" class="strength-label">WEAK</p>
+                    <div class="strength-meter" aria-hidden="true">
                         <span id="meter-fill"></span>
                     </div>
-                    <p class="summary-label">Strength</p>
-                    <p id="strength-label" class="strength-label">WEAK</p>
-                    <p id="score-label" class="score-label"></p>
-                </section>
+                    <p id="score-label" class="score-label">Score: 0 / 6</p>
+                </div>
 
-                <section class="checks-panel" aria-label="Password requirements">
-                    <h2>Password Requirements</h2>
+                <section class="analysis-panel">
+                    <div class="panel-heading">
+                        <h2>Security Requirements</h2>
+                        <p>Core checks from the password-strength analysis.</p>
+                    </div>
                     <ul class="check-list">
-                        <li id="check-minimum-length"><span></span>At least 8 characters</li>
-                        <li id="check-lowercase"><span></span>Lowercase letter</li>
-                        <li id="check-uppercase"><span></span>Uppercase letter</li>
-                        <li id="check-number"><span></span>Number</li>
-                        <li id="check-symbol"><span></span>Special character</li>
-                        <li id="check-common"><span></span>Not a common password</li>
+                        <li id="check-minimum-length">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span class="check-name">Minimum 8 characters</span>
+                            <span class="check-status">FAIL</span>
+                        </li>
+                        <li id="check-lowercase">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span class="check-name">Lowercase letter</span>
+                            <span class="check-status">FAIL</span>
+                        </li>
+                        <li id="check-uppercase">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span class="check-name">Uppercase letter</span>
+                            <span class="check-status">FAIL</span>
+                        </li>
+                        <li id="check-number">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span class="check-name">Number</span>
+                            <span class="check-status">FAIL</span>
+                        </li>
+                        <li id="check-symbol">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span class="check-name">Special character</span>
+                            <span class="check-status">FAIL</span>
+                        </li>
+                        <li id="check-common">
+                            <span class="check-dot" aria-hidden="true"></span>
+                            <span class="check-name">Not a common password</span>
+                            <span class="check-status">FAIL</span>
+                        </li>
                     </ul>
                 </section>
 
-                <section class="status-panel" aria-label="Security status">
-                    <h2>Breach Status</h2>
-                    <p id="breach-status" class="security-status"></p>
-                    <h2>Common Password Status</h2>
-                    <p id="common-status" class="security-status"></p>
+                <div class="status-grid">
+                    <section class="analysis-panel" aria-label="Data breach check">
+                        <div class="panel-heading">
+                            <h2>Data Breach Check</h2>
+                            <p>Checked against Have I Been Pwned using k-anonymity.</p>
+                        </div>
+                        <p id="breach-status" class="status-pill">CHECK UNAVAILABLE</p>
+                        <p id="breach-detail" class="detail-copy"></p>
+                    </section>
+
+                    <section class="analysis-panel" aria-label="Common password check">
+                        <div class="panel-heading">
+                            <h2>Common Password Check</h2>
+                            <p>Compared with the local common-password list.</p>
+                        </div>
+                        <p id="common-status" class="status-pill">CHECK UNAVAILABLE</p>
+                        <p id="common-detail" class="detail-copy"></p>
+                    </section>
+                </div>
+
+                <section class="explanation-panel" aria-label="Overall result explanation">
+                    <p class="result-kicker">Overall Result</p>
+                    <p id="overall-explanation"></p>
                     <div id="feedback" class="feedback"></div>
                 </section>
-            </div>
-        </section>
-    </main>
+            </section>
+
+            <aside class="privacy-notice" aria-label="Privacy notice">
+                <p class="privacy-title">Privacy</p>
+                <p id="privacy-copy">
+                    Your plaintext password is not stored or sent to the breach database. The breach check uses the first
+                    5 characters of its SHA-1 hash.
+                </p>
+            </aside>
+        </main>
+
+        <footer class="site-footer">
+            <p>Password Strength Checker</p>
+            <p>Cybersecurity Internship Project</p>
+            <p>Built with Python, Flask, HTML, CSS and JavaScript</p>
+        </footer>
+    </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
