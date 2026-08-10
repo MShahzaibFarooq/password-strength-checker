@@ -136,15 +136,15 @@ def calculate_strength(
 
     if not length_check["minimum_length"]:
         reasons.append("Password is shorter than 8 characters.")
-        return "WEAK", score, reasons
+        return "WEAK", min(score, 1), reasons
 
     if is_common_password:
         reasons.append("Password appears in the local common-password list.")
-        return "WEAK", score, reasons
+        return "WEAK", min(score, 2), reasons
 
     if breach_result["breach_check_available"] and breach_result["breached_password"]:
         reasons.append("Password has appeared in known breach data.")
-        return "WEAK", score, reasons
+        return "WEAK", min(score, 2), reasons
 
     missing_variety = [label for label, passed in character_checks.items() if not passed]
     if missing_variety:

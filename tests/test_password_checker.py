@@ -42,6 +42,7 @@ def test_common_password_is_weak(monkeypatch):
     result = password_logic.analyze_password("password")
 
     assert result["strength"] == "WEAK"
+    assert result["score"] <= 2
     assert result["checks"]["common_password"] is True
 
 
@@ -83,6 +84,7 @@ def test_breached_password_forces_weak(monkeypatch):
     result = password_logic.analyze_password("Q7m!vL2z#rT9nP4x")
 
     assert result["strength"] == "WEAK"
+    assert result["score"] <= 2
     assert result["breach_count"] == 1000
 
 

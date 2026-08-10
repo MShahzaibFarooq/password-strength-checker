@@ -67,6 +67,7 @@ Overrides:
 
 - Common passwords are classified as WEAK
 - Breached passwords are classified as WEAK
+- The displayed score is capped to a weak-level score when a hard failure occurs
 
 Final score:
 
