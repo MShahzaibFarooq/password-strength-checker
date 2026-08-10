@@ -229,8 +229,7 @@ input::placeholder {
 }
 
 .error-state,
-.results,
-.history-panel {
+.results {
     margin-top: 24px;
 }
 
@@ -300,8 +299,7 @@ input::placeholder {
 .score-label,
 .detail-copy,
 .panel-heading p,
-.feedback p,
-.history-empty {
+.feedback p {
     color: var(--muted);
     line-height: 1.55;
 }
@@ -447,42 +445,6 @@ input::placeholder {
     background: rgba(15, 23, 42, 0.62);
     border: 1px solid rgba(148, 163, 184, 0.12);
     border-radius: 10px;
-}
-
-.history-empty {
-    padding: 12px;
-    background: rgba(15, 23, 42, 0.62);
-    border: 1px solid rgba(148, 163, 184, 0.12);
-    border-radius: 10px;
-}
-
-.history-table-wrap {
-    overflow-x: auto;
-}
-
-.history-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 620px;
-}
-
-.history-table th,
-.history-table td {
-    padding: 12px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-    text-align: left;
-    font-size: 0.9rem;
-}
-
-.history-table th {
-    color: var(--accent);
-    font-size: 0.76rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.history-table td {
-    color: var(--muted-strong);
 }
 
 .strength-weak {

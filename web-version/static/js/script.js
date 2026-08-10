@@ -16,9 +16,6 @@ const commonStatus = document.querySelector("#common-status");
 const commonDetail = document.querySelector("#common-detail");
 const overallExplanation = document.querySelector("#overall-explanation");
 const feedback = document.querySelector("#feedback");
-const historyEmpty = document.querySelector("#history-empty");
-const historyTable = document.querySelector("#history-table");
-const historyList = document.querySelector("#history-list");
 
 const checkElements = {
     minimum_length: document.querySelector("#check-minimum-length"),
@@ -136,56 +133,6 @@ function showError(message) {
     errorCopy.textContent = message || "Please try again.";
 }
 
-function formatHistoryTime(value) {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-        return "Unknown";
-    }
-    return date.toLocaleString();
-}
-
-function renderHistory(history) {
-    historyList.innerHTML = "";
-    historyEmpty.hidden = history.length > 0;
-    historyTable.hidden = history.length === 0;
-
-    history.forEach((item) => {
-        const row = document.createElement("tr");
-
-        const breachLabel = !item.breach_check_available
-            ? "UNAVAILABLE"
-            : item.breached_password
-                ? `FOUND (${Number(item.breach_count).toLocaleString()})`
-                : "NOT FOUND";
-
-        [
-            formatHistoryTime(item.analyzed_at),
-            `${item.password_length} chars`,
-            item.strength,
-            item.common_password ? "YES" : "NO",
-            breachLabel,
-        ].forEach((value) => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
-
-        historyList.appendChild(row);
-    });
-}
-
-async function loadHistory() {
-    try {
-        const response = await fetch("/api/history");
-        const data = await response.json();
-        if (response.ok && Array.isArray(data.history)) {
-            renderHistory(data.history);
-        }
-    } catch (error) {
-        historyEmpty.textContent = "History unavailable.";
-    }
-}
-
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -219,7 +166,6 @@ form.addEventListener("submit", async (event) => {
         }
 
         updateResults(data);
-        await loadHistory();
         statusMessage.textContent = "Analysis complete.";
     } catch (error) {
         showError(error.message);
@@ -228,5 +174,3 @@ form.addEventListener("submit", async (event) => {
         setLoading(false);
     }
 });
-
-loadHistory();
