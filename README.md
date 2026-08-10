@@ -2,112 +2,111 @@
 
 ## Overview
 
-Password Strength Checker is a beginner-friendly cybersecurity internship project built with Flask, HTML, CSS, and vanilla JavaScript. It analyzes password strength locally and checks whether a password has appeared in known breach data using the official Have I Been Pwned Pwned Passwords API.
+Password Strength Checker is a cybersecurity internship project based on DecodeLabs Cyber Security Project 1. It demonstrates password validation, conditional logic, string handling, secure API usage, and beginner-friendly secure coding practices.
 
-## Features
+The project includes two complete implementations:
 
-- Password strength classification: WEAK, MEDIUM, or STRONG
-- Minimum length validation
-- Lowercase, uppercase, number, and special-character checks
-- Local common-password detection
-- Breached-password detection through Have I Been Pwned
-- Show/hide password control
-- JSON API endpoint for frontend/backend communication
-- Graceful handling when the online breach check is unavailable
+- `cli-version`: a pure Python terminal application
+- `web-version`: a Flask web application with HTML, CSS, and vanilla JavaScript
+
+Both versions use the same shared password-analysis logic from `shared/password_logic.py`.
 
 ## Security Features
 
-- Passwords are not stored in files, logs, sessions, or a database.
-- The plaintext password is never sent to Have I Been Pwned.
-- The complete SHA-1 hash is never sent to Have I Been Pwned.
-- Only the first 5 characters of the SHA-1 hash are sent to the HIBP range API.
-- The returned hash suffixes are checked locally.
-- `hmac.compare_digest` is used for hash suffix comparison.
-- Local checks continue to work if the HIBP API cannot be reached.
+- Minimum length check with immediate WEAK result under 8 characters
+- Lowercase, uppercase, number, and special-character checks
+- Common Password Check using `data/10k-most-common.txt`
+- HIBP breached-password check using k-anonymity
+- Plaintext passwords are never stored, logged, or sent to HIBP
+- Only the first 5 characters of the local SHA-1 hash are sent to HIBP
+- Complete SHA-1 hash matching happens locally
+- Local checks continue if the online breach check is unavailable
 
-## Technologies Used
-
-- Python 3
-- Flask
-- requests
-- HTML5
-- CSS3
-- Vanilla JavaScript
-
-## How It Works
-
-The browser sends a password to the local Flask backend through `POST /api/check-password`. The backend performs the password analysis in memory, checks the local common-password list, queries the HIBP range API using k-anonymity, and returns a JSON response to update the web interface.
+## Project Structure
 
 ```text
-Browser
-  -> HTML/CSS/JavaScript
-  -> POST /api/check-password
-  -> Flask
-  -> Local password analysis
-  -> data/10k-most-common.txt
-  -> HIBP Pwned Passwords API
-  -> JSON response
-  -> Frontend result
+password-strength-checker/
+├── README.md
+├── .gitignore
+├── data/
+│   └── 10k-most-common.txt
+├── shared/
+│   └── password_logic.py
+├── cli-version/
+│   ├── password_checker.py
+│   └── README.md
+└── web-version/
+    ├── app.py
+    ├── requirements.txt
+    ├── README.md
+    ├── templates/
+    │   └── index.html
+    └── static/
+        ├── css/
+        │   └── style.css
+        └── js/
+            └── script.js
 ```
 
 ## Password Strength Criteria
 
-Passwords shorter than 8 characters immediately fail the minimum-length requirement and are classified as WEAK.
+Length:
 
-Scoring:
+- Less than 8 characters: immediate WEAK
+- 8 to 11 characters: +1 point
+- 12 or more characters: +2 points
 
-- Less than 8 characters: 0 length points and immediate WEAK
-- 8 to 11 characters: +1
-- 12 or more characters: +2
+Character variety:
+
 - Lowercase letter: +1
 - Uppercase letter: +1
 - Number: +1
 - Special character: +1
 
-Classification:
+Overrides:
 
-- Known common password: WEAK
-- Known breached password: WEAK
-- Score 0 to 3: WEAK
-- Score 4 to 5: MEDIUM
-- Score 6: STRONG
+- Common passwords are classified as WEAK
+- Breached passwords are classified as WEAK
 
-A password is not classified as STRONG just because it is long. It must satisfy character-variety requirements and must not be common or found in known breach data.
+Final score:
+
+- 0 to 3: WEAK
+- 4 to 5: MEDIUM
+- 6: STRONG
 
 ## Common Password Detection
 
-The project uses `data/10k-most-common.txt` as a local common-password list. This list is used only to detect commonly used passwords. It is not a complete breach database.
+The file `data/10k-most-common.txt` is a local common-password list copied from Downloads. It is used for Common Password Check only. It is not a complete leaked-password database.
 
-## Breached Password Detection
+## HIBP Integration
 
-The breached-password check uses the official Have I Been Pwned Pwned Passwords API:
+The project uses the official Have I Been Pwned Pwned Passwords range endpoint:
 
-`https://api.pwnedpasswords.com/range/{first5}`
-
-The app calculates the SHA-1 hash locally, converts it to uppercase, sends only the first 5 hash characters to HIBP, and checks the returned suffixes locally. The plaintext password and complete SHA-1 hash are never sent to HIBP.
-
-If the API is unavailable, times out, returns an HTTP error, or returns an unexpected response, the app displays `Breach check unavailable` and still returns the local password-strength analysis.
-
-## Installation
-
-```bash
-python -m venv venv
+```text
+https://api.pwnedpasswords.com/range/{first5}
 ```
 
-Windows:
+The password is hashed locally with SHA-1, converted to uppercase, and only the first 5 hash characters are sent to HIBP. HIBP returns hash suffixes and counts. The full hash is reconstructed and checked locally.
 
-```bash
+## Run the CLI Version
+
+```powershell
+cd D:\GitHub\Projects\password-strength-checker\cli-version
+..\venv\bin\python.exe -m pip install requests
+python password_checker.py
+```
+
+## Run the Web Version
+
+```powershell
+cd D:\GitHub\Projects\password-strength-checker\web-version
+python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-## Running the Project
-
-```bash
 python app.py
 ```
 
-Then open the local Flask URL, usually:
+Then open:
 
 ```text
 http://127.0.0.1:5000
@@ -115,27 +114,20 @@ http://127.0.0.1:5000
 
 ## Testing
 
-Install dependencies, then run:
+From the project root:
 
-```bash
-pytest
+```powershell
+.\venv\bin\python.exe -m pytest -q
 ```
 
-Example expected results:
+Or from a Windows virtual environment:
 
-| Password | Expected Result |
-| --- | --- |
-| `123456` | WEAK |
-| `password` | WEAK and common password |
-| `Password1` | Not STRONG |
-| `Password123!` | Likely common or breached, therefore not STRONG |
-| `Ab1!` | WEAK because it is below 8 characters |
-| `abcdefgh` | WEAK because it lacks character variety |
-| `ABCDEFGH` | Not STRONG |
-| Long random password with lowercase, uppercase, number, and symbol | Potentially STRONG if not common or breached |
+```powershell
+venv\Scripts\python.exe -m pytest -q
+```
 
-The app is also tested for empty passwords, very long passwords, spaces, Unicode characters, symbols, invalid API input, HIBP API failures, and HIBP request privacy.
+Tested examples include `123456`, `password`, `Password1`, `Password123!`, `Ab1!`, `abcdefgh`, `ABCDEFGH`, empty input, spaces, symbols, Unicode, very long input, HIBP timeout handling, and a long random strong password.
 
 ## Security Considerations
 
-This project is an educational password-strength analysis tool for cybersecurity training. It demonstrates secure API usage, password-quality checks, string handling, validation, and defensive error handling. It should not be treated as a complete enterprise password-security system.
+This is an educational password-strength analysis project. It demonstrates secure handling and breach-checking basics, but it is not a complete enterprise password-security platform.

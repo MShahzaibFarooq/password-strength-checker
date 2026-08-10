@@ -7,15 +7,12 @@ from pathlib import Path
 from typing import Any
 
 import requests
-from flask import Flask, jsonify, render_template, request
 
 
-BASE_DIR = Path(__file__).resolve().parent
-COMMON_PASSWORD_FILE = BASE_DIR / "data" / "10k-most-common.txt"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+COMMON_PASSWORD_FILE = PROJECT_ROOT / "data" / "10k-most-common.txt"
 HIBP_RANGE_URL = "https://api.pwnedpasswords.com/range/{prefix}"
 HIBP_TIMEOUT_SECONDS = 5
-
-app = Flask(__name__)
 
 
 @lru_cache(maxsize=1)
@@ -37,12 +34,28 @@ def check_length(password: str) -> dict[str, Any]:
     }
 
 
+def check_lowercase(password: str) -> bool:
+    return any(char.islower() for char in password)
+
+
+def check_uppercase(password: str) -> bool:
+    return any(char.isupper() for char in password)
+
+
+def check_number(password: str) -> bool:
+    return any(char.isdigit() for char in password)
+
+
+def check_symbol(password: str) -> bool:
+    return any((not char.isalnum()) and (not char.isspace()) for char in password)
+
+
 def check_character_requirements(password: str) -> dict[str, bool]:
     return {
-        "lowercase": any(char.islower() for char in password),
-        "uppercase": any(char.isupper() for char in password),
-        "number": any(char.isdigit() for char in password),
-        "symbol": any((not char.isalnum()) and (not char.isspace()) for char in password),
+        "lowercase": check_lowercase(password),
+        "uppercase": check_uppercase(password),
+        "number": check_number(password),
+        "symbol": check_symbol(password),
     }
 
 
@@ -133,11 +146,7 @@ def calculate_strength(
         reasons.append("Password has appeared in known breach data.")
         return "WEAK", score, reasons
 
-    missing_variety = [
-        label
-        for label, passed in character_checks.items()
-        if not passed
-    ]
+    missing_variety = [label for label, passed in character_checks.items() if not passed]
     if missing_variety:
         reasons.append("Missing character variety: " + ", ".join(missing_variety) + ".")
 
@@ -177,23 +186,3 @@ def analyze_password(password: str) -> dict[str, Any]:
         "breach_check_error": breach_result["breach_check_error"],
         "feedback": feedback,
     }
-
-
-@app.route("/")
-def index() -> str:
-    return render_template("index.html")
-
-
-@app.route("/api/check-password", methods=["POST"])
-def check_password_api():
-    data = request.get_json(silent=True) or {}
-    password = data.get("password")
-
-    if not isinstance(password, str):
-        return jsonify({"error": "Password must be provided as text."}), 400
-
-    return jsonify(analyze_password(password))
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
