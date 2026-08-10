@@ -132,12 +132,17 @@ def test_web_api_rejects_missing_password():
 def test_web_api_returns_analysis(monkeypatch):
     monkeypatch.setattr(password_logic, "check_pwned_password", offline_breach_result)
     web_app = load_web_app_module()
+    web_app.ANALYSIS_HISTORY.clear()
     client = web_app.app.test_client()
 
     response = client.post("/api/check-password", json={"password": "Ab1!"})
 
     assert response.status_code == 200
     assert response.get_json()["strength"] == "WEAK"
+    history_response = client.get("/api/history")
+    history = history_response.get_json()["history"]
+    assert history[0]["password_length"] == 4
+    assert "password" not in history[0]
 
 
 def test_hibp_sends_only_sha1_prefix(monkeypatch):

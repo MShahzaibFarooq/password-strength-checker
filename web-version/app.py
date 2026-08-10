@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import sys
 from pathlib import Path
 
@@ -13,6 +14,27 @@ from shared.password_logic import analyze_password  # noqa: E402
 
 
 app = Flask(__name__)
+ANALYSIS_HISTORY: list[dict] = []
+MAX_HISTORY_ITEMS = 50
+
+
+def save_analysis_history(password: str, result: dict) -> None:
+    checks = result["checks"]
+    ANALYSIS_HISTORY.insert(
+        0,
+        {
+            "id": len(ANALYSIS_HISTORY) + 1,
+            "analyzed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "password_length": len(password),
+            "strength": result["strength"],
+            "score": result["score"],
+            "common_password": checks["common_password"],
+            "breached_password": checks["breached_password"],
+            "breach_count": result["breach_count"],
+            "breach_check_available": result["breach_check_available"],
+        },
+    )
+    del ANALYSIS_HISTORY[MAX_HISTORY_ITEMS:]
 
 
 @app.route("/")
@@ -28,7 +50,14 @@ def check_password_api():
     if not isinstance(password, str):
         return jsonify({"error": "Password must be provided as text."}), 400
 
-    return jsonify(analyze_password(password))
+    result = analyze_password(password)
+    save_analysis_history(password, result)
+    return jsonify(result)
+
+
+@app.route("/api/history", methods=["GET"])
+def analysis_history_api():
+    return jsonify({"history": ANALYSIS_HISTORY})
 
 
 if __name__ == "__main__":

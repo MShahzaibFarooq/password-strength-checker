@@ -228,52 +228,23 @@ input::placeholder {
     font-size: 0.92rem;
 }
 
-.empty-state,
 .error-state,
 .results,
-.privacy-notice {
+.history-panel {
     margin-top: 24px;
 }
 
-.empty-state,
 .error-state,
 .analysis-panel,
 .strength-card,
-.explanation-panel,
-.privacy-notice {
+.explanation-panel {
     background: rgba(21, 31, 50, 0.78);
     border: 1px solid rgba(148, 163, 184, 0.16);
     border-radius: 14px;
 }
 
-.empty-state {
-    padding: 28px;
-    text-align: center;
-}
-
-.state-marker {
-    width: 44px;
-    height: 44px;
-    margin: 0 auto 14px;
-    border: 1px solid rgba(34, 211, 238, 0.34);
-    border-radius: 14px;
-    background:
-        linear-gradient(90deg, transparent 46%, rgba(34, 211, 238, 0.7) 46%, rgba(34, 211, 238, 0.7) 54%, transparent 54%),
-        linear-gradient(0deg, transparent 46%, rgba(34, 211, 238, 0.7) 46%, rgba(34, 211, 238, 0.7) 54%, transparent 54%),
-        #101b2f;
-}
-
-.empty-state h2,
-.empty-state p,
 .error-state p {
     margin: 0;
-}
-
-.empty-state p {
-    max-width: 520px;
-    margin: 10px auto 0;
-    color: var(--muted);
-    line-height: 1.55;
 }
 
 .error-state {
@@ -330,8 +301,7 @@ input::placeholder {
 .detail-copy,
 .panel-heading p,
 .feedback p,
-.privacy-notice p,
-.site-footer p {
+.history-empty {
     color: var(--muted);
     line-height: 1.55;
 }
@@ -479,33 +449,40 @@ input::placeholder {
     border-radius: 10px;
 }
 
-.privacy-notice {
-    padding: 18px;
+.history-empty {
+    padding: 12px;
+    background: rgba(15, 23, 42, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 10px;
 }
 
-.privacy-title {
-    margin: 0 0 6px;
-    color: var(--text);
-    font-weight: 900;
+.history-table-wrap {
+    overflow-x: auto;
 }
 
-.privacy-notice p:last-child {
-    margin: 0;
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 620px;
+}
+
+.history-table th,
+.history-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    text-align: left;
     font-size: 0.9rem;
 }
 
-.site-footer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 18px;
-    justify-content: center;
-    padding: 24px 0 0;
-    text-align: center;
+.history-table th {
+    color: var(--accent);
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
-.site-footer p {
-    margin: 0;
-    font-size: 0.86rem;
+.history-table td {
+    color: var(--muted-strong);
 }
 
 .strength-weak {

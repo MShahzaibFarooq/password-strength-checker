@@ -33,7 +33,7 @@
                             placeholder="Enter your password"
                             autocomplete="new-password"
                             spellcheck="false"
-                            aria-describedby="status-message privacy-copy"
+                            aria-describedby="status-message"
                         >
                         <button type="button" id="toggle-password" class="visibility-button" aria-label="Show password">
                             Show
@@ -47,12 +47,6 @@
 
                     <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
                 </form>
-            </section>
-
-            <section id="empty-state" class="empty-state" aria-live="polite">
-                <div class="state-marker" aria-hidden="true"></div>
-                <h2>Enter a password to begin</h2>
-                <p>Your password is analyzed locally. Only a partial SHA-1 hash is used for the breach check.</p>
             </section>
 
             <section id="error-state" class="error-state" hidden aria-live="assertive">
@@ -136,20 +130,28 @@
                 </section>
             </section>
 
-            <aside class="privacy-notice" aria-label="Privacy notice">
-                <p class="privacy-title">Privacy</p>
-                <p id="privacy-copy">
-                    Your plaintext password is not stored or sent to the breach database. The breach check uses the first
-                    5 characters of its SHA-1 hash.
-                </p>
-            </aside>
+            <section class="analysis-panel history-panel" aria-label="Analysis history">
+                <div class="panel-heading">
+                    <h2>Analysis History</h2>
+                    <p>Recent checks are listed without storing the actual password.</p>
+                </div>
+                <div id="history-empty" class="history-empty">No password checks yet.</div>
+                <div class="history-table-wrap">
+                    <table id="history-table" class="history-table" hidden>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Length</th>
+                                <th>Strength</th>
+                                <th>Common</th>
+                                <th>Breach</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list"></tbody>
+                    </table>
+                </div>
+            </section>
         </main>
-
-        <footer class="site-footer">
-            <p>Password Strength Checker</p>
-            <p>Cybersecurity Internship Project</p>
-            <p>Built with Python, Flask, HTML, CSS and JavaScript</p>
-        </footer>
     </div>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
